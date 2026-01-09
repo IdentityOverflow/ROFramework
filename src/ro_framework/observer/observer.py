@@ -201,39 +201,51 @@ class Observer:
 
         return False
 
-    def is_conscious(self) -> bool:
+    def is_conscious(self, threshold: float = 0.5, test_states: List[State] = None) -> bool:
         """
-        Check if observer has structural features of consciousness.
+        Check if observer is structurally conscious.
 
-        Consciousness requires:
-        - Self-model exists (recursive internal→internal mapping)
-        - Self-model has same architectural type as world model
-        - Achieves at least depth 1 recursion
+        Uses ConsciousnessEvaluator to assess multiple structural properties:
+        - Has self-model
+        - Recursive depth
+        - Self-accuracy
+        - Architectural similarity between world and self models
+        - Calibration quality
+        - Meta-cognitive capability
+        - Limitation awareness
+
+        Args:
+            threshold: Minimum consciousness score to be considered conscious (default: 0.5)
+            test_states: Optional test states for evaluation
 
         Returns:
-            True if structural consciousness criteria met
+            True if consciousness score exceeds threshold
 
         Example:
             >>> if observer.is_conscious():
             ...     print("Observer is structurally conscious!")
+            >>> # With custom threshold
+            >>> if observer.is_conscious(threshold=0.7):
+            ...     print("High consciousness score!")
         """
-        if self.self_model is None:
-            return False
+        from ro_framework.consciousness.evaluation import ConsciousnessEvaluator
 
-        # Check if both models have similar structure
-        # In practice, this means checking if they're the same type
-        # This is a simplified check - full implementation would verify
-        # architectural similarity more rigorously
+        evaluator = ConsciousnessEvaluator(self)
+        metrics = evaluator.evaluate(test_states)
+        score = metrics.consciousness_score()
 
-        return True  # If self_model exists, basic criterion is met
+        return score >= threshold
 
     def recursive_depth(self) -> int:
         """
         Compute depth of recursive self-modeling.
 
         - Depth 0: No self-model
-        - Depth 1: Self-model exists
-        - Depth 2+: Meta-models exist (model of modeling process)
+        - Depth 1: Self-model exists (internal → internal)
+        - Depth 2+: Meta-models exist (model can represent its own modeling process)
+
+        Checks if the observer can represent its own modeling process by examining
+        whether internal DoFs can encode information about the world_model and self_model.
 
         Returns:
             Recursive depth
@@ -245,9 +257,55 @@ class Observer:
         if self.self_model is None:
             return 0
 
-        # For now, return 1 if self-model exists
-        # Full implementation would check for meta-meta-models
-        return 1
+        # Depth 1: Has self-model
+        depth = 1
+
+        # Check for depth 2: Can the internal state represent the modeling process itself?
+        # This requires checking if internal_dofs have enough capacity to encode
+        # information about the models
+        #
+        # Heuristic: If internal state dimension >= 2 * external state dimension,
+        # it potentially has capacity to represent both world state AND the modeling process
+
+        if len(self.internal_dofs) >= 2 * len(self.external_dofs):
+            # Has capacity for meta-representation
+            depth = 2
+
+        # Note: Depth 3+ would require explicit meta-meta-models or demonstrated
+        # capability to reason about reasoning about reasoning, which requires
+        # more sophisticated checks (e.g., training/testing on meta-cognitive tasks)
+
+        return depth
+
+    def get_consciousness_metrics(self, test_states: List[State] = None):
+        """
+        Get full consciousness evaluation metrics.
+
+        Uses ConsciousnessEvaluator to compute all structural consciousness metrics:
+        - has_self_model: Whether self-model exists
+        - recursive_depth: Depth of recursive self-modeling
+        - self_accuracy: How accurately self-model represents internal state
+        - architectural_similarity: Similarity between world and self models
+        - calibration_error: |confidence - accuracy|
+        - meta_cognitive_capability: Can reason about own reasoning
+        - limitation_awareness: Knows what it doesn't know
+
+        Args:
+            test_states: Optional test states for evaluation
+
+        Returns:
+            ConsciousnessMetrics with all measurements and overall score
+
+        Example:
+            >>> metrics = observer.get_consciousness_metrics()
+            >>> print(f"Consciousness score: {metrics.consciousness_score():.2f}")
+            >>> print(f"Recursive depth: {metrics.recursive_depth}")
+            >>> print(f"Self-accuracy: {metrics.self_accuracy:.2f}")
+        """
+        from ro_framework.consciousness.evaluation import ConsciousnessEvaluator
+
+        evaluator = ConsciousnessEvaluator(self)
+        return evaluator.evaluate(test_states)
 
     def know(
         self,

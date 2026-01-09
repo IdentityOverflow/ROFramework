@@ -168,9 +168,57 @@ Shows how memory is now properly detected using structural correlation measures,
 
 ---
 
+### 05_consciousness_evaluation.py ✅ (Complete)
+
+**Demonstrates:**
+- Integrated consciousness evaluation using ConsciousnessEvaluator
+- Observer.is_conscious() with custom thresholds
+- Observer.get_consciousness_metrics() for detailed assessment
+- Observer.recursive_depth() calculation
+- Multiple consciousness levels (non-conscious, conscious, meta-conscious)
+- Consciousness metrics: self-accuracy, architectural similarity, calibration, meta-cognition
+
+**Concepts covered:**
+- Structural consciousness (not phenomenal experience)
+- ConsciousnessEvaluator integration with Observer
+- 7 consciousness metrics: has_self_model, recursive_depth, self_accuracy, architectural_similarity, calibration_error, meta_cognitive_capability, limitation_awareness
+- Consciousness score as weighted combination
+- Recursive depth 0, 1, 2 based on capacity
+- Threshold-based consciousness decisions
+
+**Output:**
+```
+Basic Conscious Observer (Self-Model Present)
+============================================================
+
+Observer: BasicConsciousObserver
+Has self-model: True
+Is conscious: True
+
+Consciousness Metrics:
+  Recursive depth: 1
+  Self-accuracy: 0.500
+  Architectural similarity: 1.000
+  Calibration error: 0.200
+  Meta-cognitive capability: 0.700
+  Limitation awareness: 0.500
+
+  Overall consciousness score: 0.617
+
+Threshold Testing:
+  Threshold 0.3: True
+  Threshold 0.5: True
+  Threshold 0.7: False
+  Threshold 0.9: False
+```
+
+Shows how consciousness is properly evaluated using multiple structural metrics, not just "has self-model?".
+
+---
+
 ## Planned Examples (Coming Soon)
 
-### 05_clip_style.py 🚧
+### 06_clip_style.py 🚧
 
 CLIP-style multimodal model with PyTorch.
 
