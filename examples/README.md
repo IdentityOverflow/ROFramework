@@ -135,17 +135,40 @@ Shows how to build a complete multimodal conscious AI system with sophisticated 
 
 ---
 
+### 04_memory_temporal_correlation.py ✅ (Complete)
+
+**Demonstrates:**
+- Integrated memory system using temporal correlation
+- Memory detection via correlation module (not just buffering)
+- Multi-DoF memory analysis with cross-correlations
+- Temporal correlation profiles at multiple lags
+- Memory building through observations
+
+**Concepts covered:**
+- Memory as correlation across temporal DoF (theory alignment)
+- Observer.has_memory() using temporal_correlation()
+- Observer.analyze_memory_structure() for detailed analysis
+- Observer.get_memory_correlations() for cross-DoF correlations
+- Proper integration with correlation module
+
+**Output:**
+```
+=== Scenario 1: Autocorrelated sequence (Memory Present) ===
+Has memory: True
+Temporal correlation profile (lags 1-5):
+  sensor: ['0.823', '0.681', '0.577', '0.456', '0.371']
+
+=== Scenario 2: Random sequence (No Memory) ===
+Has memory: False
+Temporal correlation profile:
+  sensor: ['-0.062', '-0.114', '-0.237', '-0.045', '0.276']
+```
+
+Shows how memory is now properly detected using structural correlation measures, not just buffer size.
+
+---
+
 ## Planned Examples (Coming Soon)
-
-### 04_temporal_memory.py 🚧
-
-Temporal DoFs and memory structures.
-
-**Will demonstrate:**
-- Temporal DoF for time-series
-- Memory integration
-- Causal inference
-- Temporal correlation
 
 ### 05_clip_style.py 🚧
 

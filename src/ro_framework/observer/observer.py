@@ -156,16 +156,17 @@ class Observer:
         """
         return self.resolution.get(dof, 1e-6)
 
-    def has_memory(self, threshold: float = 0.5, lag: int = 1) -> bool:
+    def has_memory(self, threshold: float = 0.5, max_lag: int = 5) -> bool:
         """
-        Check if observer has memory structure.
+        Check if observer has memory structure using temporal correlation.
 
-        Memory exists if correlation across temporal DoF exceeds
-        what would be expected from instantaneous external correlations.
+        Memory exists if significant temporal correlation is detected across
+        the temporal DoF, beyond what would be expected from random noise.
+        Uses the correlation module's temporal_correlation() function.
 
         Args:
             threshold: Minimum correlation to consider "significant"
-            lag: Temporal lag for autocorrelation
+            max_lag: Maximum temporal lag to check
 
         Returns:
             True if memory structure detected
@@ -174,32 +175,29 @@ class Observer:
             >>> if observer.has_memory():
             ...     print("Observer has memory!")
         """
-        if self.temporal_dof is None or len(self.memory_buffer) < lag + 2:
+        from ro_framework.correlation.measures import temporal_correlation
+
+        if self.temporal_dof is None or len(self.memory_buffer) < 3:
             return False
 
-        # Check for temporal correlation in any internal DoF
-        # This is a simplified check - full implementation would compute
-        # autocorrelation for each DoF
-
+        # Check for significant temporal correlation in any internal DoF
         for dof in self.internal_dofs:
-            # Extract values for this DoF across time
-            values = []
-            for state in self.memory_buffer:
-                val = state.get_value(dof)
-                if val is not None:
-                    values.append(float(val))
+            try:
+                # Check multiple lags
+                for lag in range(1, min(max_lag + 1, len(self.memory_buffer) // 2)):
+                    corr = temporal_correlation(
+                        states=self.memory_buffer,
+                        dof=dof,
+                        temporal_dof=self.temporal_dof,
+                        lag=lag
+                    )
 
-            if len(values) < lag + 2:
+                    if abs(corr) > threshold:
+                        return True
+
+            except (ValueError, ZeroDivisionError):
+                # Not enough variance or data for this DoF
                 continue
-
-            # Compute lagged correlation
-            v1 = np.array(values[:-lag])
-            v2 = np.array(values[lag:])
-
-            if len(v1) > 1 and np.std(v1) > 0 and np.std(v2) > 0:
-                corr = np.corrcoef(v1, v2)[0, 1]
-                if abs(corr) > threshold:
-                    return True
 
         return False
 
@@ -327,6 +325,77 @@ class Observer:
         total_uncertainty = resolution_uncertainty + model_uncertainty
 
         return total_uncertainty
+
+    def analyze_memory_structure(self, max_lag: int = 10) -> Dict[DoF, List[float]]:
+        """
+        Analyze memory structure using temporal correlation analysis.
+
+        Returns temporal correlations for each internal DoF, showing
+        how strongly the DoF's current value predicts future values.
+
+        Args:
+            max_lag: Maximum temporal lag to analyze
+
+        Returns:
+            Dictionary mapping each DoF to its temporal correlation profile
+
+        Example:
+            >>> memory_analysis = observer.analyze_memory_structure()
+            >>> for dof, correlations in memory_analysis.items():
+            ...     print(f"{dof.name}: {correlations}")
+        """
+        from ro_framework.correlation.measures import temporal_correlation
+
+        if self.temporal_dof is None or len(self.memory_buffer) < 3:
+            return {}
+
+        analysis = {}
+
+        for dof in self.internal_dofs:
+            try:
+                correlations = []
+                for lag in range(1, min(max_lag + 1, len(self.memory_buffer) // 2)):
+                    corr = temporal_correlation(
+                        states=self.memory_buffer,
+                        dof=dof,
+                        temporal_dof=self.temporal_dof,
+                        lag=lag
+                    )
+                    correlations.append(corr)
+                analysis[dof] = correlations
+            except (ValueError, ZeroDivisionError):
+                # Not enough variance or data
+                analysis[dof] = []
+
+        return analysis
+
+    def get_memory_correlations(self, dof1: DoF, dof2: DoF) -> float:
+        """
+        Compute correlation between two DoFs across memory.
+
+        Uses Pearson correlation from the correlation module to measure
+        how two internal DoFs co-vary over time.
+
+        Args:
+            dof1: First DoF
+            dof2: Second DoF
+
+        Returns:
+            Correlation coefficient between -1 and 1
+
+        Example:
+            >>> corr = observer.get_memory_correlations(latent1, latent2)
+            >>> print(f"Correlation: {corr:.3f}")
+        """
+        from ro_framework.correlation.measures import pearson_correlation
+
+        if len(self.memory_buffer) < 2:
+            return 0.0
+
+        try:
+            return pearson_correlation(self.memory_buffer, dof1, dof2)
+        except (ValueError, ZeroDivisionError):
+            return 0.0
 
     def clear_memory(self) -> None:
         """
