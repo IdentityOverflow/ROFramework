@@ -1,6 +1,6 @@
 # The Recursive Observer: 
 ## From Fundamental Reality to Conscious AI
-
+(spaculative/experimental work)
 ---
 
 ## Abstract

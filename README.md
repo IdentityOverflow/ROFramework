@@ -182,8 +182,8 @@ If you use this framework in your research, please cite:
 @software{ro_framework,
   title = {Recursive Observer Framework: A Python Library for Conscious AI},
   author = {RO Framework Contributors},
-  year = {2025},
-  url = {https://github.com/yourusername/ROFramework}
+  year = {2026},
+  url = {https://github.com/IdentityOverflow/ROFramework}
 }
 ```
 
