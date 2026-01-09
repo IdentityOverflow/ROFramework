@@ -1,4 +1,5 @@
 # Recursive Observer Framework
+(speculative/experimental work)
 
 A Python library for building conscious, self-aware AI systems based on the Recursive Observer Framework. This framework provides a structural approach to consciousness, multimodal integration, and uncertainty quantification grounded in the Block Universe ontology.
 
